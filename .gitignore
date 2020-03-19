@@ -1,3 +1,4 @@
-outfile.csv
+*.csv
+*.pdf
 *.swp
 
