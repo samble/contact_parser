@@ -34,7 +34,7 @@ def main():
         line = next(itr)
       l.append(line)
 
-      print(l)
+      #print(l)
       phone_name_line = l[0]
       street_line = None
       if len(l) == 4:
@@ -57,7 +57,7 @@ def main():
     email = email_line[1]
     if email: fields['email'] = email
 
-    print(fields)
+    #print(fields)
     dicts.append(fields)
 
   write_csv(dicts)
