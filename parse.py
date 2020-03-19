@@ -1,9 +1,10 @@
 #!python3
 
 import csv
+import sys
 
 def main():
-  f = open ('tabulated_contacts_bernie_rutherford.csv')
+  f = open (sys.argv[1])
   rd = csv.reader(f)
   csvlines = []
   for row in rd:
