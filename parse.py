@@ -11,9 +11,11 @@ def main():
     csvlines.append(row)
   itr = iter(csvlines)
 
+  dicts = []
+
   for line in itr:
     l = []
-    print(str(line))
+    #print(str(line))
 
     phone_name_line = None
     street_line = None
@@ -21,8 +23,11 @@ def main():
     email_line = None
 
     if line[0].find('\n') >= 0:
-      print('single fields')
       phone_name_line, street_line, city_line, email_line = parse_line(line[0])
+      #print(phone_name_line)
+      #print(street_line)
+      #print(city_line)
+      #print(email_line)
     else:
       while line[0].find('Email:') < 0:
         l.append(line)
@@ -36,6 +41,7 @@ def main():
       city_line = l[-2]
       email_line = l[-1]
 
+    #print(city_line)
     fields = {}
     fields['phone'] = phone_name_line[0]
     fields['name'] = phone_name_line[1]
@@ -51,22 +57,60 @@ def main():
     if email: fields['email'] = email
 
     print(fields)
+    dicts.append(fields)
+
+  write_csv(dicts)
+
+def write_csv(dicts):
+  cols = ['phone', 'name', 'addr', 'city', 'age', 'gender', 'u_thing', 'email']
+  with open('outfile.csv', 'w') as csvfile:
+    writer = csv.DictWriter(csvfile, fieldnames=cols)
+    writer.writeheader()
+    for d in dicts:
+      writer.writerow(d)
 
 def parse_line(line):
   #phone_name_line, street_line, city_line, email_line = parse_line(line)
   s = line.split('\n')
-  phone = line[0][0:14]
-  name = line[0][14:line[0].find('\n')]
+  phone = s[0][0:14]
+  name = s[0][14:]
 
-  city = s[1]
-  fields['addr'] = addr
+  street = ''
+  if len(s) > 3:
+    street = s[1]
+  
+  deets = s[-2]
+  deets, city = extract_deets(deets)
+  email = s[-1]
 
-  deets = s[2]
+  return [phone, name], [street], [deets, city], ['Email:', email]
 
-  age, gender, u_thing, city = extract_deets(deets)
-  fields['age'] = age
-  fields['gender'] = gender
-  fields['u_thing'] = u_thing
-  fields['city'] = city
 
-  print(str(fields))
+def extract_deets(deets):
+  age = ''
+  gender = ''
+  u_thing = ''
+  city = ''
+
+  age = deets[0:deets.find(' ')]
+
+  if age.isnumeric():
+    deets = deets[len(age) + 1:]
+  else:
+    age = ''
+
+  if deets[0] in ('M','F'):
+    gender = deets[0]
+    deets = deets[1:]
+
+  if deets[0] == ' ': #if they have the U
+    u_thing = deets[1]
+    city = deets[2:]
+  else:
+    city = deets
+
+  return ' '.join((age, gender, u_thing)), city
+
+
+if __name__ == '__main__':
+  main()
