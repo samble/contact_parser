@@ -34,10 +34,11 @@ def main():
         line = next(itr)
       l.append(line)
 
+      print(l)
       phone_name_line = l[0]
       street_line = None
       if len(l) == 4:
-        street_line = l[1]
+        street_line = [l[1][1]]
       city_line = l[-2]
       email_line = l[-1]
 
@@ -72,8 +73,12 @@ def write_csv(dicts):
 def parse_line(line):
   #phone_name_line, street_line, city_line, email_line = parse_line(line)
   s = line.split('\n')
-  phone = s[0][0:14]
-  name = s[0][14:]
+  phone = ''
+  if not s[0][0].isalpha():
+    phone = s[0][0:14]
+    name = s[0][14:]
+  else:
+    name = s[0]
 
   street = ''
   if len(s) > 3:
@@ -81,7 +86,10 @@ def parse_line(line):
   
   deets = s[-2]
   deets, city = extract_deets(deets)
+
   email = s[-1]
+  if email.startswith('Email:'):
+    email = email[6:]
 
   return [phone, name], [street], [deets, city], ['Email:', email]
 
@@ -96,19 +104,19 @@ def extract_deets(deets):
 
   if age.isnumeric():
     deets = deets[len(age) + 1:]
+
+    if deets[0] in ('M','F'):
+      gender = deets[0]
+      deets = deets[1:]
+
+    if deets[0] == ' ': #if they have the U
+      u_thing = deets[1]
+      city = deets[2:]
+    else:
+      city = deets
+
   else:
     age = ''
-
-  if deets[0] in ('M','F'):
-    gender = deets[0]
-    deets = deets[1:]
-
-  if deets[0] == ' ': #if they have the U
-    u_thing = deets[1]
-    city = deets[2:]
-  else:
-    city = deets
-
   return ' '.join((age, gender, u_thing)), city
 
 
